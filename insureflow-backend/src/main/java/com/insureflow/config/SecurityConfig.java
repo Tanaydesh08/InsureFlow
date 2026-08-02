@@ -28,30 +28,28 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/**"
-                        ).permitAll()
-                        .anyRequest()
-                        .authenticated()
-                )
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
 
         DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider();
+                new DaoAuthenticationProvider(customUserDetailsService);
 
-        provider.setUserDetailsPasswordService(customUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
 
         return provider;
@@ -59,8 +57,9 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+            AuthenticationConfiguration configuration)
+            throws Exception {
 
-        return config.getAuthenticationManager();
+        return configuration.getAuthenticationManager();
     }
 }

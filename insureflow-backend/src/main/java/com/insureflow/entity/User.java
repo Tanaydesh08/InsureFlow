@@ -27,20 +27,27 @@ public class User {
     @Column(nullable = false)
     private String  password;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Builder.Default
     private Boolean enable = true;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public void prePersist(){
+    @PrePersist
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+
+        if (this.enable == null) {
+            this.enable = true;
+        }
     }
 
-
-    public void preUpdate(){
+    @PreUpdate
+    public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 }
