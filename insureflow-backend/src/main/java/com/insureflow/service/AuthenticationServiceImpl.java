@@ -5,6 +5,8 @@ import com.insureflow.dto.LoginRequest;
 import com.insureflow.dto.RegisterRequest;
 import com.insureflow.entity.User;
 import com.insureflow.enums.Role;
+import com.insureflow.exception.DuplicateResourceException;
+import com.insureflow.exception.ResourceNotFoundException;
 import com.insureflow.repository.UserRepository;
 import com.insureflow.security.CustomUserDetails;
 import com.insureflow.security.JwtService;
@@ -27,7 +29,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException("Email already exists");
         }
 
         User user = User.builder()
@@ -35,6 +37,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.CUSTOMER)
+                .enable(true)
                 .build();
 
         userRepository.save(user);
@@ -59,7 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = jwtService.generateToken(new CustomUserDetails(user));
 
