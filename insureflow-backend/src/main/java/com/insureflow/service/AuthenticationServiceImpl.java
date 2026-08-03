@@ -36,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.CUSTOMER)
+                .role(request.getRole())
                 .enable(true)
                 .build();
 
@@ -48,6 +48,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .token(token)
                 .type("Bearer")
                 .message("Registration successful")
+                .role(user.getRole())
+                .fullName(user.getFullName())
                 .build();
     }
 
@@ -70,6 +72,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .token(token)
                 .type("Bearer")
                 .message("Login successful")
+                .role(user.getRole())
+                .fullName(user.getFullName())
                 .build();
     }
 }
